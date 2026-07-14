@@ -63,9 +63,9 @@ function ColorWheel({ hue, onChange }) {
 
   const updateFromEvent = useCallback(
     (clientX, clientY) => {
-      const react = ref.current.getBoundingClientReact();
-      const cx = react.left + react.width / 2;
-      const cy= react.top + react.height / 2;
+      const rect = ref.current.getBoundingClientRect();
+      const cx = rect.left + react.width / 2;
+      const cy= rect.top + react.height / 2;
 
       const angle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
 
@@ -95,7 +95,8 @@ function ColorWheel({ hue, onChange }) {
   const rad = ((hue - 90) * Math.PI) / 180;
   const knobX = 50 + 42 * Math.cos(rad);
   const knobY = 50 + 42 * Math.sin(rad);
-
+  
+  return (
   <div
       ref={ref}
       onPointerDown={handlePointerDown}
@@ -150,6 +151,7 @@ function ColorWheel({ hue, onChange }) {
         }}
       />
     </div>
+  );  
 };
 
 // Main App //
