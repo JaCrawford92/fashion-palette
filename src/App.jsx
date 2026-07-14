@@ -258,6 +258,24 @@ const deleteFavorite = (id) => {
               Shade: {lightness}%
             </div>
 
+            <button
+              onClick={saveCurrentPalette}
+              style={{
+                marginTop: 20,
+                fontFamily: "Helvetica Neve, Arial, sans-serif",
+                fontSize: 13,
+                padding: "10px 14px",
+                background: "#F3EFE6",
+                color: "#161513",
+                border: "none",
+                borderRadius: "2",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Save this palette
+            </button>
+
             <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 6 }}>
               {Object.entries(HARMONIES).map(([key, h]) => (
                 <button
@@ -295,6 +313,7 @@ const deleteFavorite = (id) => {
                 marginBottom: 16,
               }}
             >
+            
               {cfg.label} Palette
             </div>
 
@@ -339,6 +358,67 @@ const deleteFavorite = (id) => {
             </p>
           </div>
         </div>
+
+        {favorites.length > 0 && (
+          <div style={{ marginTop: 56, borderTop: "1px solid rgba(243,239,230,0.2)", paddingTop: 32 }}>
+            <div
+              style={{
+                fontFamily: "Helvetica Neue, Arial, sans-serif",
+                fontSize: 11,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                opacity: 0.6,
+                marginBottom: 16,
+              }}
+            >
+              Saved Palettes
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {favorites.map((fav) => (
+                <div
+                  key={fav.id}
+                  style={{ display: "flex", alignItems: "center", gap: 12 }}
+                >
+                  <div
+                    onClick={() => loadFavorite(fav)}
+                    style={{ display: "flex", gap: 4, cursor: "pointer" }}
+                  >
+                    {buildPalette(fav.hue, fav.harmonyKey, fav.lightness).map((c, i) => (
+                      <div
+                        key={i}
+                        style={{ width: 28, height: 28, background: c.hex, borderRadius: 2 }}
+                      />
+                    ))}
+                  </div>
+                 <span
+                    style={{
+                      fontFamily: "Helvetica Neue, Arial, sans-serif",
+                      fontSize: 12,
+                      opacity: 0.6,
+                      flex: 1,
+                    }}
+                 >
+                    {HARMONIES[fav.harmonyKey].label}
+                  </span>
+                  <button
+                    onClick={() => deleteFavorite(fav.id)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#F3EFE6",
+                      opacity: 0.5,
+                      cursor: "pointer",
+                      fontSize: 12,
+                    }}
+                  >
+                    ✕
+                  </button>
+               </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
       </div>
     </div>
   );
