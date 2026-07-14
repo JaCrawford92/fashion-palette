@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 
 // Color Math //
 
@@ -160,8 +160,35 @@ export default function FashionPalette() {
   const [hue, setHue] = useState(212);
   const [harmonyKey, setHarmonyKey] = useState("complementary");
   const [lightness, setLightness] = useState(54);
+  const [favorites, setFavorites] = useState(() =>{
+    const stored = localStorage.getItem("paletteFavorites");
+    return stored ? JSON.parse(stored) : [];
+  });
+  useEffect(() => {
+    localStorage.setItem("paletteFavorites", JSON.stringify(favorites));
+  }, [favorites]);
   const palette = buildPalette(hue, harmonyKey, lightness);
   const cfg = HARMONIES[harmonyKey];
+
+  const saveCurrentPalette = () => {
+  const newFavorite = {
+    id: Date.now(),
+    hue,
+    harmonyKey,
+    lightness,
+  };
+  setFavorites((prev) => [...prev, newFavorite]);
+};
+
+const loadFavorite = (fav) => {
+  setHue(fav.hue);
+  setHarmonyKey(fav.harmonyKey);
+  setLightness(fav.lightness);
+};
+
+const deleteFavorite = (id) => {
+  setFavorites((prev) => prev.filter((f) => f.id !== id));
+};
 
   return (
     <div
