@@ -64,8 +64,8 @@ function ColorWheel({ hue, onChange }) {
   const updateFromEvent = useCallback(
     (clientX, clientY) => {
       const rect = ref.current.getBoundingClientRect();
-      const cx = rect.left + react.width / 2;
-      const cy= rect.top + react.height / 2;
+      const cx = rect.left + rect.width / 2;
+      const cy= rect.top + rect.height / 2;
 
       const angle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
 
