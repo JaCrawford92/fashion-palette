@@ -18,7 +18,7 @@ const normalize= (h) => ((h % 360) + 360) % 360;
 const HARMONIES = {
   complementary: {
     label: "complementary",
-    hues: (h) => [h, h + 100],
+    hues: (h) => [h, h + 180],
     note: "Opposite hues create maximum contrast...",
   },
   analogous: {
