@@ -43,7 +43,7 @@ const HARMONIES = {
   },
 };
 
-function buildPalette(hue, harmonyKey) {
+function buildPalette(hue, harmonyKey, lightness) {
   const cfg = HARMONIES[harmonyKey];
   const hues = cfg.hues(hue).map(normalize);
   return hues.map((h, i) => ({
@@ -51,7 +51,7 @@ function buildPalette(hue, harmonyKey) {
     hex: hslToHex(
       h,
       harmonyKey === "monochrome" ? 55 : 68,
-      harmonyKey === "monochrome" ? 22 + i * 14 : 54
+      harmonyKey === "monochrome" ? 22 + i * 14 : lightness
     ),
   }));
 };
@@ -159,7 +159,8 @@ function ColorWheel({ hue, onChange }) {
 export default function FashionPalette() {
   const [hue, setHue] = useState(212);
   const [harmonyKey, setHarmonyKey] = useState("complementary");
-  const palette = buildPalette(hue, harmonyKey);
+  const [lightness, setLightness] = useState(54);
+  const palette = buildPalette(hue, harmonyKey, lightness);
   const cfg = HARMONIES[harmonyKey];
 
   return (
@@ -216,6 +217,18 @@ export default function FashionPalette() {
               }}
             >
               Drag the wheel to choose a base hue
+            </div>
+            
+             <input
+              type="range"
+              min={20}
+              max={80}
+              value={lightness}
+              onChange={(e) => setLightness(Number(e.target.value))}
+              style={{ width: 220, marginTop: 20 }}
+            />
+            <div style={{ fontFamily: "Helvetica Neue, Arial, sans-serif", fontSize: 12, opacity: 0.5, marginTop: 8 }}>
+              Shade: {lightness}%
             </div>
 
             <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 6 }}>
