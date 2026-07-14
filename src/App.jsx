@@ -45,4 +45,31 @@ const HARMONIES = {
 
 function buildPalette(hue, harmonyKey) {
   const cfg = HARMONIES[harmonyKey];
+  return hues.map((h, i) => ({
+    hue: h,
+    hex: hslToHex(
+      h,
+      harmonyKey === "monochrome" ? 55 : 68,
+      harmonyKey === "monochrome" ? 22 + i * 14 : 54
+    ),
+  }));
+};
+
+// Color Wheel Picker //
+
+function ColorWheel({ hue, onChange }) {
+  const ref = useRef(null);
+
+  const updateFromEvent = useCallback(
+    (clientX, clientY) => {
+      const react = ref.current.getBoundingClientReact();
+      const cx = react.left + react.width / 2;
+      const cy= react.top + rea h.height / 2;
+
+      const angle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
+
+      onChange(normalize(angle + 90));
+    },
+  [onChange]
+);
 };
