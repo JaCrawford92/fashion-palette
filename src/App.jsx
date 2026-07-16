@@ -43,14 +43,14 @@ const HARMONIES = {
   },
 };
 
-function buildPalette(hue, harmonyKey, lightness) {
+function buildPalette(hue, harmonyKey, lightness, saturation) {
   const cfg = HARMONIES[harmonyKey];
   const hues = cfg.hues(hue).map(normalize);
   return hues.map((h, i) => ({
     hue: h,
     hex: hslToHex(
       h,
-      harmonyKey === "monochrome" ? 55 : 68,
+      harmonyKey === "monochrome" ? 55 : saturation,
       harmonyKey === "monochrome" ? 22 + i * 14 : lightness
     ),
   }));
@@ -159,35 +159,41 @@ function ColorWheel({ hue, onChange }) {
 export default function FashionPalette() {
   const [hue, setHue] = useState(212);
   const [harmonyKey, setHarmonyKey] = useState("complementary");
+  const [saturation, setSaturation] = useState(68);
   const [lightness, setLightness] = useState(54);
-  const [favorites, setFavorites] = useState(() =>{
-    const stored = localStorage.getItem("paletteFavorites");
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [favorites, setFavorites] = useState([]);
   useEffect(() => {
-    localStorage.setItem("paletteFavorites", JSON.stringify(favorites));
-  }, [favorites]);
-  const palette = buildPalette(hue, harmonyKey, lightness);
+    fetch("http://localhost:3001/api/favorites")
+    .then((res) => res.json())
+    .then((data) => setFavorites(data));
+  }, []);
+
+  const palette = buildPalette(hue, harmonyKey, lightness, saturation);
   const cfg = HARMONIES[harmonyKey];
 
   const saveCurrentPalette = () => {
-  const newFavorite = {
-    id: Date.now(),
-    hue,
-    harmonyKey,
-    lightness,
+    fetch("http://localhost:3001/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body:JSON.stringify({ hue, harmonyKey, lightness, saturation }),
+    })
+    .then((res) => res.json())
+    .then((newFavorite) => setFavorites((prev) => [...prev, newFavorite]));
   };
-  setFavorites((prev) => [...prev, newFavorite]);
-};
 
 const loadFavorite = (fav) => {
   setHue(fav.hue);
   setHarmonyKey(fav.harmonyKey);
   setLightness(fav.lightness);
+  setSaturation(fav.saturation);
 };
 
 const deleteFavorite = (id) => {
-  setFavorites((prev) => prev.filter((f) => f.id !== id));
+   fetch(`http://localhost:3001/api/favorites/${id}`, {
+    method: "DELETE",
+  }).then(() => {
+    setFavorites((prev) => prev.filter((f) => f.id !== id));
+  });
 };
 
   return (
@@ -246,7 +252,7 @@ const deleteFavorite = (id) => {
               Drag the wheel to choose a base hue
             </div>
             
-             <input
+            <input
               type="range"
               min={20}
               max={80}
@@ -256,6 +262,18 @@ const deleteFavorite = (id) => {
             />
             <div style={{ fontFamily: "Helvetica Neue, Arial, sans-serif", fontSize: 12, opacity: 0.5, marginTop: 8 }}>
               Shade: {lightness}%
+            </div>
+
+            <input
+              type="range"
+              min={20}
+              max={100}
+              value={saturation}
+              onChange={(e) => setSaturation(Number(e.target.value))}
+              style={{ width: 220, marginTop: 20 }}
+            />
+            <div style={{ fontFamily: "Helvetica Neue, Arial, sans-serif", fontSize: 12, opacity: 0.5, marginTop: 8 }}>
+              Vividness: {saturation}%
             </div>
 
             <button
@@ -383,7 +401,7 @@ const deleteFavorite = (id) => {
                     onClick={() => loadFavorite(fav)}
                     style={{ display: "flex", gap: 4, cursor: "pointer" }}
                   >
-                    {buildPalette(fav.hue, fav.harmonyKey, fav.lightness).map((c, i) => (
+                    {buildPalette(fav.hue, fav.harmonyKey, fav.lightness, fav.saturation).map((c, i) => (
                       <div
                         key={i}
                         style={{ width: 28, height: 28, background: c.hex, borderRadius: 2 }}
@@ -418,7 +436,7 @@ const deleteFavorite = (id) => {
           </div>
         </div>
       )}
-      
+
       </div>
     </div>
   );
